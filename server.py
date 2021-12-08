@@ -34,9 +34,15 @@ def create_app(config={}):
 
     @app.route('/showSummary',methods=['POST'])
     def showSummary():
-        club = [club for club in clubs if club['email'] == request.form['email']][0]
-        return render_template('welcome.html',club=club,competitions=competitions)
-
+        email = request.form['email']
+        if email == '':
+            flash('Please enter an email')
+            return redirect(url_for('index'))
+        club = [club for club in clubs if club['email'] == email]
+        if club == []:
+            flash('Email unknown')
+            return redirect(url_for('index'))
+        return render_template('welcome.html', club=club, competitions=competitions)
 
     @app.route('/book/<competition>/<club>')
     def book(competition,club):
@@ -47,7 +53,6 @@ def create_app(config={}):
         else:
             flash("Something went wrong-please try again")
             return render_template('welcome.html', club=club, competitions=competitions)
-
 
     @app.route('/purchasePlaces',methods=['POST'])
     def purchasePlaces():

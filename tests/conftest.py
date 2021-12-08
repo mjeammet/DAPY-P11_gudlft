@@ -1,6 +1,9 @@
 import pytest
 from server import create_app, loadClubs, loadCompetitions
 
+def init_db():
+    clubs = loadClubs('tests/test_clubs.json')
+
 @pytest.fixture
 def client():
     app = create_app({"TESTING": True})

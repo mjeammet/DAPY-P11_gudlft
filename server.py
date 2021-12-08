@@ -59,3 +59,5 @@ def create_app(config):
     @app.route('/logout')
     def logout():
         return redirect(url_for('index'))
+
+    return app

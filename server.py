@@ -35,12 +35,10 @@ def create_app(config={}):
     @app.route('/showSummary',methods=['POST'])
     def showSummary():
         email = request.form['email']
-        if email == '':
-            flash('Please enter an email')
-            return redirect(url_for('index'))
-        club = [club for club in clubs if club['email'] == email]
-        if club == []:
-            flash('Email unknown')
+        try:
+            club = [club for club in clubs if club['email'] == email][0]
+        except IndexError:
+            flash('Sorry, that email wasn\'t found.')
             return redirect(url_for('index'))
         return render_template('welcome.html', club=club, competitions=competitions)
 

@@ -3,24 +3,30 @@ from flask import Flask,render_template,request,redirect,flash,url_for
 
 
 def loadClubs(clubs_json):
-    with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+    with open(clubs_json) as c:
+        listOfClubs = json.load(c)['clubs']
+        return listOfClubs
 
 
 def loadCompetitions(competitions_json):
-    with open('competitions.json') as comps:
+    with open(competitions_json) as comps:
          listOfCompetitions = json.load(comps)['competitions']
          return listOfCompetitions
 
 
-def create_app(config):
+def create_app(config={}):
     app = Flask(__name__)
+    app.config.update(config)
     app.secret_key = 'something_special'
-    app.config.from_object(config)
 
-    competitions = loadCompetitions('competitions.json')
-    clubs = loadClubs('clubs.json')
+    competitions_json = 'competitions.json'
+    clubs_json = 'clubs.json'
+    if app.config["TESTING"] == True:
+        competitions_json = 'tests/test_dataset.json'
+        clubs_json = 'tests/test_dataset.json'
+
+    competitions = loadCompetitions(competitions_json)
+    clubs = loadClubs(clubs_json)
 
     @app.route('/')
     def index():

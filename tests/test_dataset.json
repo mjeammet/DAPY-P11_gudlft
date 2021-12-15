@@ -8,8 +8,13 @@
 ],
     "competitions": [
         {
-            "name": "Test Festival",
+            "name": "Past Competition",
             "date": "2020-03-27 10:00:00",
+            "numberOfPlaces": "8"
+        },
+        {
+            "name": "Future Competition",
+            "date": "2030-03-27 10:00:00",
             "numberOfPlaces": "8"
         }
     ]

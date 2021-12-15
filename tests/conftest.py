@@ -14,5 +14,11 @@ def test_club():
     return loadClubs('tests/test_dataset.json')[0]
 
 @pytest.fixture
-def test_competition():
-    return loadCompetitions('tests/test_dataset.json')[0]
+def future_competition():
+    competitions = loadCompetitions('tests/test_dataset.json')
+    return competitions[1]
+
+@pytest.fixture
+def past_competition():
+    competitions = loadCompetitions('tests/test_dataset.json')
+    return competitions[0]

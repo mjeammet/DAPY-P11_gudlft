@@ -1,9 +1,12 @@
 import pytest
 from server import create_app, loadClubs, loadCompetitions
 
+<<<<<<< HEAD
 def init_db():
     clubs = loadClubs('tests/test_clubs.json')
 
+=======
+>>>>>>> origin/bug/issue#2
 @pytest.fixture
 def client():
     app = create_app({"TESTING": True})
@@ -18,4 +21,8 @@ def test_club():
 
 @pytest.fixture
 def test_competition():
+<<<<<<< HEAD
     return loadCompetitions('tests/test_dataset.json')[0]
+=======
+    return loadCompetitions('tests/test_dataset.json')[0]
+>>>>>>> origin/bug/issue#2

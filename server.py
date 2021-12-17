@@ -1,10 +1,13 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 
+MAX_PER_CLUB = 12
 
 def loadClubs(clubs_json):
     with open(clubs_json) as c:
         listOfClubs = json.load(c)['clubs']
+        for club in listOfClubs:
+            club['points'] = int(club['points'])
         return listOfClubs
 
 
@@ -58,15 +61,18 @@ def create_app(config={}):
         club = [c for c in clubs if c['name'] == request.form['club']][0]
         placesRequired = int(request.form['places'])
         placesRemaining = int(competition['numberOfPlaces'])
-        if placesRequired > int(club['points']):
+        if placesRequired > club['points']:
             flash(f"Cannot book - trying to book more than what you have.")
             return render_template('booking.html',club=club, competition=competition)
         elif placesRequired > placesRemaining:
             flash(f"Cannot book - trying to book more than what remains.")
-            return render_template('booking.html',club=club, competition=competition)
+            return render_template('booking.html', club=club, competition=competition)
+        elif placesRequired > MAX_PER_CLUB:
+            flash(f'Cannot book - Trying to book more than maximum allowed ({MAX_PER_CLUB})')
+            return render_template('booking.html', club=club, competition=competition)
         else:
             flash('Great-booking complete!')
-            club['points'] = int(club['points']) - placesRequired
+            club['points'] = club['points'] - placesRequired
             competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
             return render_template('welcome.html', club=club, competitions=competitions)
 

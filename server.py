@@ -5,6 +5,8 @@ from flask import Flask,render_template,request,redirect,flash,url_for
 def loadClubs(clubs_json):
     with open(clubs_json) as c:
         listOfClubs = json.load(c)['clubs']
+        for club in listOfClubs:
+            club["points"] = int(club["points"])
         return listOfClubs
 
 
@@ -35,12 +37,15 @@ def create_app(config={}):
     @app.route('/showSummary',methods=['POST'])
     def showSummary():
         club = [club for club in clubs if club['email'] == request.form['email']][0]
-        return render_template('welcome.html',club=club,competitions=competitions)
+        return render_template('welcome.html', club=club, competitions=competitions)
 
 
     @app.route('/book/<competition>/<club>')
     def book(competition,club):
         foundClub = [c for c in clubs if c['name'] == club][0]
+        if foundClub["points"] == 0:
+            flash("You have no point and cannot make any reservation!")
+            return render_template('welcome.html', club=foundClub, competitions=competitions)
         foundCompetition = [c for c in competitions if c['name'] == competition][0]
         if foundClub and foundCompetition:
             return render_template('booking.html',club=foundClub,competition=foundCompetition)

@@ -16,3 +16,8 @@ def test_club():
 @pytest.fixture
 def test_competition():
     return loadCompetitions('tests/test_dataset.json')[0]
+
+@pytest.fixture
+def zero_point_club():
+    clubs = loadClubs('tests/test_dataset.json')
+    return [club for club in clubs if club['points'] == 0][0]

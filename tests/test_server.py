@@ -24,3 +24,8 @@ class TestAuth:
         assert response.status_code == 200
         error_message = "Cannot book - trying to book more than what remains."
         assert error_message in response.data.decode()
+
+    def test_shouldnt_book_when_0_points(self, client, zero_point_club):
+        response = client.post('/showSummary', data={"email": zero_point_club["email"]})
+        assert b'cannot make any reservation!' in response.data
+        assert b'Book places' not in response.data

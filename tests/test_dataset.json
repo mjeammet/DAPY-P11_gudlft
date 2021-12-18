@@ -4,6 +4,11 @@
         "name":"Test Club",
         "email":"test@test.fr",
         "points":"11"
+    },
+    {
+        "name": "Zero point club",
+        "email":"zero@mail.fr",
+        "points":"0"
     }
 ],
     "competitions": [

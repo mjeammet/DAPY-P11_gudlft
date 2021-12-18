@@ -48,6 +48,9 @@ def create_app(config={}):
     @app.route('/book/<competition>/<club>')
     def book(competition,club):
         foundClub = [c for c in clubs if c['name'] == club][0]
+        if foundClub["points"] == 0:
+            flash("You have no point and cannot make any reservation!")
+            return render_template('welcome.html', club=foundClub, competitions=competitions)
         foundCompetition = [c for c in competitions if c['name'] == competition][0]
         if foundClub and foundCompetition:
             return render_template('booking.html',club=foundClub,competition=foundCompetition)

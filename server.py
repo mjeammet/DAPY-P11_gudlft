@@ -1,3 +1,4 @@
+import datetime
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 
@@ -13,8 +14,15 @@ def loadClubs(clubs_json):
 
 def loadCompetitions(competitions_json):
     with open(competitions_json) as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+        listOfCompetitions = json.load(comps)['competitions']
+        date_format = "%Y-%m-%d %H:%M:%S"
+        for competition in listOfCompetitions:
+            competition['date'] = datetime.datetime.strptime(competition["date"], date_format)
+            if competition['date'] < datetime.datetime.now():
+                competition['is_past'] = True
+            else:
+                competition['is_past'] = False
+        return listOfCompetitions
 
 
 def create_app(config={}):
@@ -52,6 +60,9 @@ def create_app(config={}):
             flash("You have no point and cannot make any reservation!")
             return render_template('welcome.html', club=foundClub, competitions=competitions)
         foundCompetition = [c for c in competitions if c['name'] == competition][0]
+        if foundCompetition['is_past'] == True:
+            flash('Cannot book past competitions.')
+            return bad_request()
         if foundClub and foundCompetition:
             return render_template('booking.html',club=foundClub,competition=foundCompetition)
         else:
@@ -62,6 +73,9 @@ def create_app(config={}):
     def purchasePlaces():
         competition = [c for c in competitions if c['name'] == request.form['competition']][0]
         club = [c for c in clubs if c['name'] == request.form['club']][0]
+        if competition['is_past'] == True:
+            flash('Cannot book past competitions.')
+            return bad_request()
         placesRequired = int(request.form['places'])
         placesRemaining = int(competition['numberOfPlaces'])
         if placesRequired > club['points']:
@@ -85,5 +99,10 @@ def create_app(config={}):
     @app.route('/logout')
     def logout():
         return redirect(url_for('index'))
+
+    
+    @app.errorhandler(400)
+    def bad_request():
+        return render_template("exception.html"), 400
 
     return app

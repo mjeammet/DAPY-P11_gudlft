@@ -93,14 +93,14 @@ def create_app(config={}):
             competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
             return render_template('welcome.html', club=club, competitions=competitions)
 
-    # TODO: Add route for points display
-
+    @app.route('/pointsBoard', methods=['GET'])
+    def pointsBoard():
+        return render_template('points_board.html', clubs=clubs)
 
     @app.route('/logout')
     def logout():
         return redirect(url_for('index'))
 
-    
     @app.errorhandler(400)
     def bad_request():
         return render_template("exception.html"), 400

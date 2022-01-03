@@ -1,8 +1,10 @@
 import datetime
 import json
+from typing_extensions import Required
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 MAX_PER_CLUB = 12
+POINTS_FOR_ENTRY = 3
 
 def loadClubs(clubs_json):
     with open(clubs_json) as c:
@@ -57,7 +59,7 @@ def create_app(config={}):
     def book(competition,club):
         foundClub = [c for c in clubs if c['name'] == club][0]
         if foundClub["points"] == 0:
-            flash("You have no point and cannot make any reservation!")
+            flash("You don't have enough points to make any reservation.")
             return render_template('welcome.html', club=foundClub, competitions=competitions)
         foundCompetition = [c for c in competitions if c['name'] == competition][0]
         if foundCompetition['is_past'] == True:
@@ -78,7 +80,7 @@ def create_app(config={}):
             return bad_request()
         placesRequired = int(request.form['places'])
         placesRemaining = int(competition['numberOfPlaces'])
-        if placesRequired > club['points']:
+        if placesRequired > club['points']/POINTS_FOR_ENTRY:
             flash(f"Cannot book - trying to book more than what you have.")
             return render_template('booking.html',club=club, competition=competition)
         elif placesRequired > placesRemaining:
@@ -89,7 +91,7 @@ def create_app(config={}):
             return render_template('booking.html', club=club, competition=competition)
         else:
             flash('Great-booking complete!')
-            club['points'] = club['points'] - placesRequired
+            club['points'] = club['points'] - placesRequired*POINTS_FOR_ENTRY
             competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
             return render_template('welcome.html', club=club, competitions=competitions)
 

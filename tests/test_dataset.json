@@ -1,0 +1,36 @@
+{
+    "clubs":[
+    {
+        "name":"Test Club",
+        "email":"test@test.fr",
+        "points":"11"
+    },
+    {
+        "name":"Zero point Club",
+        "email":"zero@mail.fr",
+        "points":"0"
+    },
+    {
+        "name":"Hundred points Club",
+        "email":"hundred@mail.fr",
+        "points":"100"
+    }
+],
+    "competitions": [
+        {
+            "name": "Past Competition",
+            "date": "2020-03-27 10:00:00",
+            "numberOfPlaces": "8"
+        },
+        {
+            "name": "Future Competition",
+            "date": "2030-03-27 10:00:00",
+            "numberOfPlaces": "8"
+        },
+        {
+            "name": "Future Empty Competition",
+            "date": "2030-03-27 10:00:00",
+            "numberOfPlaces": "100"
+        }        
+    ]
+}

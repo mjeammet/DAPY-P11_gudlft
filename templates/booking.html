@@ -16,12 +16,14 @@
         {% endif%}
     {% endwith %}
     <p>Places available: {{competition['numberOfPlaces']}}</p>
-    <p>Club points: {{club['points']}}</p>
-    <form action="/purchasePlaces" method="post">
-        <input type="hidden" name="club" value="{{club['name']}}">
-        <input type="hidden" name="competition" value="{{competition['name']}}">
-        <label for="places">How many places?</label><input type="number" name="places" id="" max="{{ [club['points'], 12]|min }}" min="1"/>
-        <button type="submit">Book</button>
-    </form>
+    {% with max_entries = (club['points']/points_per_entry) | round(0, 'floor') | int %}
+        <p>Club points: {{club['points']}} (= max {{ max_entries }} entries)</p>
+        <form action="/purchasePlaces" method="post">
+            <input type="hidden" name="club" value="{{club['name']}}">
+            <input type="hidden" name="competition" value="{{competition['name']}}">
+            <label for="places">How many places?</label><input type="number" name="places" id="" max="{{ [max_entries, 12]|min }}" min="1"/>
+            <button type="submit">Book</button>
+        </form>
+    {% endwith %}
 </body>
 </html>

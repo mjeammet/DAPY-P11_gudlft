@@ -4,7 +4,8 @@ from typing_extensions import Required
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 MAX_PER_CLUB = 12
-POINTS_FOR_ENTRY = 3
+POINTS_PER_ENTRY = 3
+
 
 def loadClubs(clubs_json):
     with open(clubs_json) as c:
@@ -58,7 +59,7 @@ def create_app(config={}):
     @app.route('/book/<competition>/<club>')
     def book(competition,club):
         foundClub = [c for c in clubs if c['name'] == club][0]
-        if foundClub["points"] == 0:
+        if foundClub["points"] < POINTS_PER_ENTRY:
             flash("You don't have enough points to make any reservation.")
             return render_template('welcome.html', club=foundClub, competitions=competitions)
         foundCompetition = [c for c in competitions if c['name'] == competition][0]
@@ -66,7 +67,7 @@ def create_app(config={}):
             flash('Cannot book past competitions.')
             return bad_request()
         if foundClub and foundCompetition:
-            return render_template('booking.html',club=foundClub,competition=foundCompetition)
+            return render_template('booking.html', club=foundClub, competition=foundCompetition, points_per_entry=POINTS_PER_ENTRY)
         else:
             flash("Something went wrong-please try again")
             return render_template('welcome.html', club=club, competitions=competitions)
@@ -80,18 +81,18 @@ def create_app(config={}):
             return bad_request()
         placesRequired = int(request.form['places'])
         placesRemaining = int(competition['numberOfPlaces'])
-        if placesRequired > club['points']/POINTS_FOR_ENTRY:
+        if placesRequired > club['points']/POINTS_PER_ENTRY:
             flash(f"Cannot book - trying to book more than what you have.")
-            return render_template('booking.html',club=club, competition=competition)
+            return render_template('booking.html',club=club, competition=competition, points_per_entry=POINTS_PER_ENTRY)
         elif placesRequired > placesRemaining:
             flash(f"Cannot book - trying to book more than what remains.")
-            return render_template('booking.html', club=club, competition=competition)
+            return render_template('booking.html', club=club, competition=competition, points_per_entry=POINTS_PER_ENTRY)
         elif placesRequired > MAX_PER_CLUB:
             flash(f'Cannot book - Trying to book more than maximum allowed ({MAX_PER_CLUB})')
-            return render_template('booking.html', club=club, competition=competition)
+            return render_template('booking.html', club=club, competition=competition, points_per_entry=POINTS_PER_ENTRY)
         else:
             flash('Great-booking complete!')
-            club['points'] = club['points'] - placesRequired*POINTS_FOR_ENTRY
+            club['points'] = club['points'] - placesRequired*POINTS_PER_ENTRY
             competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
             return render_template('welcome.html', club=club, competitions=competitions)
 

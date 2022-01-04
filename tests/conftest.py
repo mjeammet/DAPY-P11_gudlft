@@ -5,8 +5,6 @@ from server import create_app, loadClubs, loadCompetitions
 def client():
     app = create_app({"TESTING": True})
     with app.test_client() as client:
-        # with app.app_context():
-        #     init_db()
         yield client
 
 @pytest.fixture
@@ -37,3 +35,4 @@ def zero_point_club():
 def hundred_point_club():
     clubs = loadClubs('tests/test_dataset.json')
     return [club for club in clubs if club['points'] == 100][0]
+

@@ -9,7 +9,6 @@ class TestAuth:
 
     def test_should_redirect_known_email(self, client, test_club):
         email = test_club["email"]
-        # email = "john@simplylift.co"
         response = client.post('/showSummary', data={'email' : email})
         assert response.status_code == 200
 
@@ -28,7 +27,8 @@ class TestBooking:
     def test_valid_booking_should_update_club_points(self, client, test_club, future_competition):  
         places = 1
         initial_club_points = int(test_club['points'])
-        response = client.post('/purchasePlaces', data={"competition": future_competition["name"], "club": test_club['name'], "places": places})
+        data = {"competition": future_competition["name"], "club": test_club['name'], "places": places}
+        response = client.post('/purchasePlaces', data=data)
         assert response.status_code == 200
         assert f'Points available: {initial_club_points-places}' in response.data.decode('utf-8')
 

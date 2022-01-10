@@ -88,7 +88,7 @@ def create_app(config={}):
             flash(f'Cannot book - Trying to book more than maximum allowed ({MAX_PER_CLUB})')
             return render_template('booking.html', club=club, competition=competition)
         else:
-            flash('Great-booking complete!')
+            flash(f'Great, succesfully booked {placesRequired} place(s)!')
             club['points'] = club['points'] - placesRequired
             competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
             return render_template('welcome.html', club=club, competitions=competitions)

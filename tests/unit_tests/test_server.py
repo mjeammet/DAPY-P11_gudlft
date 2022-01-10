@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from server import MAX_PER_CLUB, loadClubs
+from server import MAX_PER_CLUB, POINTS_PER_ENTRY, loadClubs
 
 
 class TestAuth:
@@ -20,9 +20,9 @@ class TestAuth:
 
 class TestBooking:
 
-    def test_valid_book_should_confirm_booked_entries(self, client, test_club, test_competition):
+    def test_valid_book_should_confirm_booked_entries(self, client, test_club, future_competition):
         places = 1
-        response = client.post('/purchasePlaces', data={"competition": test_competition["name"], "club": test_club['name'], "places": places})
+        response = client.post('/purchasePlaces', data={"competition": future_competition["name"], "club": test_club['name'], "places": places})
         assert response.status_code == 200
         assert f"Great, succesfully booked {places} place(s)" in response.data.decode("utf-8")
 
@@ -32,7 +32,7 @@ class TestBooking:
         data = {"competition": future_competition["name"], "club": test_club['name'], "places": places}
         response = client.post('/purchasePlaces', data=data)
         assert response.status_code == 200
-        assert f'Points available: {initial_club_points-places}' in response.data.decode('utf-8')
+        assert f'Points available: {initial_club_points-places*POINTS_PER_ENTRY}' in response.data.decode('utf-8')
 
     def test_shouldnt_book_past_competitions(self, client, test_club, past_competition):
         places = 1
@@ -47,9 +47,9 @@ class TestBooking:
         error_message = f"Cannot book - trying to book more than what you have."
         assert error_message in response.data.decode()
 
-    def test_shouldnt_book_more_than_remaining(self, client, test_club, future_competition):
+    def test_shouldnt_book_more_than_remaining(self, client, hundred_point_club, future_competition):
         places = int(future_competition['numberOfPlaces']) +1
-        response = client.post('/purchasePlaces', data={"competition": future_competition["name"], "club": test_club['name'], "places": places})
+        response = client.post('/purchasePlaces', data={"competition": future_competition["name"], "club": hundred_point_club['name'], "places": places})
         assert response.status_code == 200
         error_message = "Cannot book - trying to book more than what remains."
         assert error_message in response.data.decode()
@@ -65,6 +65,14 @@ class TestBooking:
         response = client.post('/showSummary', data={"email": zero_point_club["email"]})
         assert b'cannot make any reservation!' in response.data
         assert b'Book places' not in response.data
+    
+    def test_not_enough_points_to_book(self, client, test_club, future_competition):
+        places = int(test_club['points']) +1
+        response = client.post('/purchasePlaces', data={"competition": future_competition["name"], "club": test_club['name'], "places": places})
+        assert response.status_code == 200
+        error_message = f"Cannot book - trying to book more than what you have."
+        assert error_message in response.data.decode()
+
 
 
 class TestPointsBoard:

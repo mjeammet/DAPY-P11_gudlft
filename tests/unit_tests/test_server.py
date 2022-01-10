@@ -1,11 +1,21 @@
+import pytest
 from datetime import datetime as dt
 from server import MAX_PER_CLUB, POINTS_PER_ENTRY, loadClubs
+from tests.conftest import future_competition, test_club
 
 
 class TestAuth:
     
-    def test_should_access_home(self, client):
-        assert client.get('/').status_code == 200
+    @pytest.mark.parametrize(
+        "endpoint, expected_code", [
+            ('/', 200),
+            ('/showSummary', 405),
+            ('/purchasePlaces', 405),
+            ('/logout', 302), 
+            ('/pointsBoard', 200)])
+            # TODO add /book/ endpoint with test club and competition (currently test dataset not loaded during parametrize)
+    def test_endpoint_accesses(self, client, endpoint, expected_code):
+        assert client.get(endpoint).status_code == expected_code
 
     def test_should_redirect_known_email(self, client, test_club):
         email = test_club["email"]

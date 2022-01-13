@@ -1,8 +1,56 @@
+import json
+from plistlib import load
 import pytest
-from datetime import datetime as dt
-from server import MAX_PER_CLUB, POINTS_PER_ENTRY, loadClubs
+from datetime import datetime
+from server import MAX_PER_CLUB, POINTS_PER_ENTRY, loadClubs, loadCompetitions
 from tests.conftest import future_competition, test_club
 
+
+class TestDatabase:
+
+    def test_loadClubs(self):
+        
+        clubs = loadClubs('tests/test_dataset.json')
+        expected = [{
+            "name":"Test Club",
+            "email":"test@test.fr",
+            "points":11
+            },
+            {
+                "name":"Zero point Club",
+                "email":"zero@mail.fr",
+                "points":0
+            },
+            {
+                "name":"Hundred points Club",
+                "email":"hundred@mail.fr",
+                "points":100
+            }]
+        assert clubs == expected
+
+    def test_loadCompetitions(self):
+        
+        compets = loadCompetitions('tests/test_dataset.json')
+        expected = [
+            {
+                "date": datetime(2020, 3, 27, 10, 00, 00),
+                'is_past': True,
+                "name": "Past Competition",
+                "numberOfPlaces": '8'
+            },
+            {
+                "name": "Future Competition",
+                "date": datetime(2030, 3, 27, 10, 00, 00),
+                'is_past': False,
+                "numberOfPlaces": '8'
+            },
+            {
+                "name": "Future Empty Competition",
+                "date": datetime(2030, 3, 27, 10, 00, 00),
+                'is_past': False,
+                "numberOfPlaces": '100'
+            }]
+        assert compets == expected
 
 class TestAuth:
     
@@ -21,11 +69,15 @@ class TestAuth:
         email = test_club["email"]
         response = client.post('/showSummary', data={'email' : email})
         assert response.status_code == 200
+        assert f'Welcome, {email}' in response.data.decode()
+        assert f'Points available: {test_club["points"]}' in response.data.decode()
 
     def test_unknown_email_should_return_error(self, client):
-        email = 'certainlynotaknownadress@test.fr'
+        email = 'certainlynotaknownadress@mail.fr'
         response = client.post('/showSummary', data={'email' : email})
         assert response.status_code == 302
+        response_redirected = client.post('/showSummary', data={'email' : email}, follow_redirects = True)
+        assert "Sorry, that email wasn&#39;t" in response_redirected.data.decode()
 
 
 class TestBooking:

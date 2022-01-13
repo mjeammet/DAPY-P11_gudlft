@@ -16,14 +16,14 @@ class TestIntegrationClass:
         logout_page = client.get("/logout")
         assert logout_page.status_code == 302
 
-    def test_should_book_and_logout(self, client, test_club, future_competition):
+    def test_should_reach_booking_page_and_book(self, client, test_club, future_competition):
         """Tests access booking page and book an entry."""        
         
         # Reach booking page
         booking_page = client.get(f'/book/{future_competition["name"]}/{test_club["name"]}')
         assert booking_page.status_code == 200
 
-        # Actually book one entry
+        # Book one entry
         places = 1
         initial_club_points = test_club['points']        
         initial_competition_places = int(future_competition["numberOfPlaces"])

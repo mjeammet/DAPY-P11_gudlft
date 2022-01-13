@@ -1,5 +1,3 @@
-import json
-from plistlib import load
 import pytest
 from datetime import datetime
 from server import MAX_PER_CLUB, POINTS_PER_ENTRY, loadClubs, loadCompetitions
@@ -134,7 +132,6 @@ class TestBooking:
         assert response.status_code == 200
         error_message = f"Cannot book - trying to book more than what you have."
         assert error_message in response.data.decode()
-
 
 
 class TestPointsBoard:
